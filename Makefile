@@ -5,10 +5,16 @@ export
 export PROJECT_ROOT=${shell pwd}
 
 env-up:
-	docker compose up -d postgres
+	docker compose up -d app-db
 
 env-down:
-	docker compose down postgres
+	docker compose down app-db
+
+env-port-forward:
+	@docker compose up -d port-forwarder
+
+env-port-close:
+	@docker compose down port-forwarder
 
 # выключает вывод выполняемых команд
 .SILENT: env-cleanup
