@@ -51,3 +51,6 @@ migrate-action:
 		-path /migrations \
 		-database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@app-db:5432/${POSTGRES_DB}?sslmode=disable \
 		$(action)
+
+app-run:
+	@go run cmd/todoapp/main.go
