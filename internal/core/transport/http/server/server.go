@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	core_loger "todo-api/internal/core/logger"
+	core_http_middleware "todo-api/internal/core/transport/http/middleware"
 
 	"go.uber.org/zap"
 )
@@ -14,16 +15,29 @@ type HTTPServer struct {
 	mux    *http.ServeMux
 	config Config
 	log    *core_loger.Logger
+
+	middleware []core_http_middleware.Middleware
 }
 
-func NewHTTPServer(config Config, logger *core_loger.Logger) *HTTPServer {
-	return &HTTPServer{mux: http.NewServeMux(), config: config, log: logger}
+func NewHTTPServer(
+	config Config,
+	logger *core_loger.Logger,
+	middleware ...core_http_middleware.Middleware,
+) *HTTPServer {
+	return &HTTPServer{
+		mux:        http.NewServeMux(),
+		config:     config,
+		log:        logger,
+		middleware: middleware,
+	}
 }
 
 func (s *HTTPServer) Run(ctx context.Context) error {
+	mux := core_http_middleware.ChainMiddleware(s.mux, s.middleware...)
+
 	server := &http.Server{
 		Addr:    s.config.Address,
-		Handler: s.mux,
+		Handler: mux,
 	}
 
 	ch := make(chan error, 1)
@@ -64,7 +78,7 @@ func (s *HTTPServer) Run(ctx context.Context) error {
 	return nil
 }
 
-func (s *HTTPServer) RegisterAPIRouters(routers ...APIVersionRouter) {
+func (s *HTTPServer) RegisterAPIRouters(routers ...*APIVersionRouter) {
 	for _, router := range routers {
 		prefix := "/api/" + string(router.apiVersion)
 

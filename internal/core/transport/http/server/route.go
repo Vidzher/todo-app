@@ -7,10 +7,10 @@ import (
 type Route struct {
 	Method  string
 	Path    string
-	Handler http.Handler
+	Handler http.HandlerFunc
 }
 
-func NewRoute(method, path string, handler http.Handler) Route {
+func NewRoute(method, path string, handler http.HandlerFunc) Route {
 	return Route{
 		Method:  method,
 		Path:    path,
