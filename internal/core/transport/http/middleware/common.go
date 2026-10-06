@@ -78,6 +78,7 @@ func Trace() Middleware {
 
 			log.Debug(
 				">>> incoming HTTP request",
+				zap.String("method", r.Method),
 				zap.Time("time", before.UTC()),
 			)
 

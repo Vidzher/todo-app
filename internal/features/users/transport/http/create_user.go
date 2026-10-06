@@ -13,12 +13,7 @@ type CreateUserRequest struct {
 	PhoneNumber *string `json:"phoneNumber" validate:"omitempty,min=10,max=15,startswith=+"`
 }
 
-type CreateUserResponse struct {
-	ID          int     `json:"id"`
-	Version     int     `json:"version"`
-	FullName    string  `json:"fullName"`
-	PhoneNumber *string `json:"phoneNumber"`
-}
+type CreateUserResponse UserDTOResponse
 
 func (h *UsersHTTPHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -41,20 +36,11 @@ func (h *UsersHTTPHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := dtoFromDomain(userDomain)
+	response := CreateUserResponse(userDTOFromDomain(userDomain))
 
 	responseHandler.JSONResponse(response, http.StatusCreated)
 }
 
 func domainFromDTO(dto CreateUserRequest) domain.User {
 	return domain.NewUserUninitialized(dto.FullName, dto.PhoneNumber)
-}
-
-func dtoFromDomain(user domain.User) CreateUserResponse {
-	return CreateUserResponse{
-		ID:          user.ID,
-		Version:     user.Version,
-		FullName:    user.FullName,
-		PhoneNumber: user.PhoneNumber,
-	}
 }
