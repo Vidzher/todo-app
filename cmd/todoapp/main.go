@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 	core_loger "todo-api/internal/core/logger"
-	core_postgres_pool "todo-api/internal/core/repository/postgres/pool"
+	core_pgx_pool "todo-api/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "todo-api/internal/core/transport/http/middleware"
 	core_http_server "todo-api/internal/core/transport/http/server"
 	tasks_postgres_repository "todo-api/internal/features/tasks/repository/postgres"
@@ -32,7 +32,7 @@ func main() {
 	defer logger.Close()
 
 	logger.Debug("initializing postgres connection pool")
-	pool, err := core_postgres_pool.NewConnectionPool(ctx, core_postgres_pool.NewConfigMust())
+	pool, err := core_pgx_pool.NewPool(ctx, core_pgx_pool.NewConfigMust())
 	if err != nil {
 		logger.Fatal("failed to init postgres connection pool", zap.Error(err))
 	}

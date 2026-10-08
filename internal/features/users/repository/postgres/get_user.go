@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"todo-api/internal/core/domain"
 	core_errors "todo-api/internal/core/errors"
-
-	"github.com/jackc/pgx/v5"
+	core_postgres_pool "todo-api/internal/core/repository/postgres/pool"
 )
 
 func (r *UsersRepository) GetUser(ctx context.Context, id int) (domain.User, error) {
@@ -29,7 +28,7 @@ func (r *UsersRepository) GetUser(ctx context.Context, id int) (domain.User, err
 		&userModel.FullName,
 		&userModel.PhoneNumber,
 	)
-	if errors.Is(err, pgx.ErrNoRows) {
+	if errors.Is(err, core_postgres_pool.ErrNoRows) {
 		return domain.User{}, fmt.Errorf(
 			"user with id=%d: %v: %w",
 			id,
