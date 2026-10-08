@@ -7,3 +7,5 @@ var (
 	ErrInvalidArgument = errors.New("invalid argument")
 	ErrConflict        = errors.New("conflict")
 )
+
+const PGX_VIOLATES_FOREIGN_KEY_CODE = "23503"
