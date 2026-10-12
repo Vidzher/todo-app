@@ -19,6 +19,11 @@ type TasksRepository interface {
 		ctx context.Context,
 		limit, offset *int,
 	) ([]domain.Task, error)
+
+	GetTask(
+		ctx context.Context,
+		id int,
+	) (domain.Task, error)
 }
 
 func NewTasksService(repo TasksRepository) *TasksService {
