@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"todo-api/internal/core/domain"
 	core_errors "todo-api/internal/core/errors"
-
-	"github.com/jackc/pgx/v5/pgconn"
+	core_postgres_pool "todo-api/internal/core/repository/postgres/pool"
 )
 
 func (r *TasksRepository) CreateTask(
@@ -51,16 +50,13 @@ func (r *TasksRepository) CreateTask(
 		&taskModel.AuthorUserID,
 	)
 	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			if pgErr.Code == core_errors.PGX_VIOLATES_FOREIGN_KEY_CODE {
-				return domain.Task{}, fmt.Errorf(
-					"authorID=%d not found: %v: %w",
-					task.AuthorUserID,
-					err,
-					core_errors.ErrNotFound,
-				)
-			}
+		if errors.Is(err, core_postgres_pool.ErrViolatesFK) {
+			return domain.Task{}, fmt.Errorf(
+				"authorID=%d not found: %v: %w",
+				task.AuthorUserID,
+				err,
+				core_errors.ErrNotFound,
+			)
 		}
 
 		return domain.Task{}, fmt.Errorf("scan error: %w", err)
