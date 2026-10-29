@@ -27,6 +27,8 @@ func (h *TasksHTTPHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// validate here
+
 	taskDomain := domainFromDTO(req)
 
 	taskDomain, err := h.tasksService.CreateTask(ctx, taskDomain)

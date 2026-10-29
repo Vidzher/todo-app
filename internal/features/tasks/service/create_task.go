@@ -6,6 +6,7 @@ import (
 	"todo-api/internal/core/domain"
 )
 
+// move validation to transport layer
 func (s *TasksService) CreateTask(
 	ctx context.Context,
 	task domain.Task,
