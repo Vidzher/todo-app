@@ -7,11 +7,11 @@ import (
 	core_errors "todo-api/internal/core/errors"
 )
 
-// move validation to transport layer
 func (s *TasksService) CreateTask(
 	ctx context.Context,
 	task domain.Task,
 ) (domain.Task, error) {
+	// move validation to transport layer
 	if err := task.Validate(); err != nil {
 		return domain.Task{}, fmt.Errorf("validate task domain: %w", err)
 	}
