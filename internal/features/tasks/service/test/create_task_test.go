@@ -32,8 +32,8 @@ func TestCreateTask(t *testing.T) {
 				CompletedAt:  nil,
 			},
 			expected: domain.Task{
-				ID:           domain.UninitializedID,
-				Version:      domain.UninitializedVersion,
+				ID:           1,
+				Version:      1,
 				AuthorUserID: 1,
 				Title:        "New task",
 				Description:  nil,
@@ -57,7 +57,7 @@ func TestCreateTask(t *testing.T) {
 			},
 			expected:    domain.Task{},
 			expectedErr: core_errors.ErrInvalidArgument,
-			exists:      true,
+			exists:      false,
 		},
 	}
 
