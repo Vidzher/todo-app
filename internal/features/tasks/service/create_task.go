@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"todo-api/internal/core/domain"
+	core_errors "todo-api/internal/core/errors"
 )
 
 // move validation to transport layer
@@ -15,7 +16,20 @@ func (s *TasksService) CreateTask(
 		return domain.Task{}, fmt.Errorf("validate task domain: %w", err)
 	}
 
-	task, err := s.tasksRepository.CreateTask(ctx, task)
+	exists, err := s.tasksRepository.TitleExists(ctx, task)
+	if err != nil {
+		return domain.Task{}, fmt.Errorf("create task: %w", err)
+	}
+
+	if exists {
+		return domain.Task{}, fmt.Errorf(
+			"task with title=%s already exists: %w",
+			task.Title,
+			core_errors.ErrConflict,
+		)
+	}
+
+	task, err = s.tasksRepository.CreateTask(ctx, task)
 	if err != nil {
 		return domain.Task{}, fmt.Errorf("create task: %w", err)
 	}
