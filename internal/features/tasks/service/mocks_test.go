@@ -301,6 +301,78 @@ func (_c *MockTasksRepository_GetTasks_Call) RunAndReturn(run func(ctx context.C
 	return _c
 }
 
+// PatchTask provides a mock function for the type MockTasksRepository
+func (_mock *MockTasksRepository) PatchTask(ctx context.Context, id int, task domain.Task) (domain.Task, error) {
+	ret := _mock.Called(ctx, id, task)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PatchTask")
+	}
+
+	var r0 domain.Task
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int, domain.Task) (domain.Task, error)); ok {
+		return returnFunc(ctx, id, task)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, int, domain.Task) domain.Task); ok {
+		r0 = returnFunc(ctx, id, task)
+	} else {
+		r0 = ret.Get(0).(domain.Task)
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, int, domain.Task) error); ok {
+		r1 = returnFunc(ctx, id, task)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockTasksRepository_PatchTask_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PatchTask'
+type MockTasksRepository_PatchTask_Call struct {
+	*mock.Call
+}
+
+// PatchTask is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id int
+//   - task domain.Task
+func (_e *MockTasksRepository_Expecter) PatchTask(ctx any, id any, task any) *MockTasksRepository_PatchTask_Call {
+	return &MockTasksRepository_PatchTask_Call{Call: _e.mock.On("PatchTask", ctx, id, task)}
+}
+
+func (_c *MockTasksRepository_PatchTask_Call) Run(run func(ctx context.Context, id int, task domain.Task)) *MockTasksRepository_PatchTask_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 int
+		if args[1] != nil {
+			arg1 = args[1].(int)
+		}
+		var arg2 domain.Task
+		if args[2] != nil {
+			arg2 = args[2].(domain.Task)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockTasksRepository_PatchTask_Call) Return(task1 domain.Task, err error) *MockTasksRepository_PatchTask_Call {
+	_c.Call.Return(task1, err)
+	return _c
+}
+
+func (_c *MockTasksRepository_PatchTask_Call) RunAndReturn(run func(ctx context.Context, id int, task domain.Task) (domain.Task, error)) *MockTasksRepository_PatchTask_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // TitleExists provides a mock function for the type MockTasksRepository
 func (_mock *MockTasksRepository) TitleExists(ctx context.Context, task domain.Task) (bool, error) {
 	ret := _mock.Called(ctx, task)

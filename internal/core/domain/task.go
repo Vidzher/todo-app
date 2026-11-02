@@ -116,3 +116,36 @@ func (t *Task) Validate() error {
 
 	return nil
 }
+
+type TaskPatch struct {
+	Title       *string
+	Description *string
+	Completed   *bool
+}
+
+func (t *Task) ApplyPatch(patch TaskPatch) error {
+	tmp := *t
+
+	if patch.Title != nil {
+		tmp.Title = *patch.Title
+	}
+
+	if patch.Description != nil {
+		tmp.Description = patch.Description
+	}
+
+	if patch.Completed != nil {
+		tmp.Completed = *patch.Completed
+
+		if *patch.Completed {
+			now := time.Now()
+			tmp.CompletedAt = &now
+		} else {
+			tmp.CompletedAt = nil
+		}
+	}
+
+	*t = tmp
+
+	return nil
+}
