@@ -1,0 +1,1 @@
+drop index if exists tasks_author_id_title_idx;

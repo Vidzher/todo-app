@@ -29,6 +29,11 @@ type TasksRepository interface {
 		ctx context.Context,
 		id int,
 	) error
+
+	TitleExists(
+		ctx context.Context,
+		task domain.Task,
+	) (bool, error)
 }
 
 func NewTasksService(repo TasksRepository) *TasksService {

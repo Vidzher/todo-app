@@ -79,14 +79,14 @@ func (t *Task) Validate() error {
 
 	if t.AuthorUserID <= 0 {
 		return fmt.Errorf(
-			"invalid `AuthorUserID`: %d",
+			"invalid `AuthorUserID`: %w",
 			core_errors.ErrInvalidArgument,
 		)
 	}
 
 	if !t.Completed && t.CompletedAt != nil {
 		return fmt.Errorf(
-			"invalid `CompletedAt`: %d",
+			"invalid `CompletedAt`: %w",
 			core_errors.ErrInvalidArgument,
 		)
 	}
@@ -108,7 +108,7 @@ func (t *Task) Validate() error {
 	} else {
 		if t.CompletedAt != nil {
 			return fmt.Errorf(
-				"`CompletedAt` must be nil if `Completed`=`false`: %d",
+				"`CompletedAt` must be nil if `Completed`=`false`: %w",
 				core_errors.ErrInvalidArgument,
 			)
 		}
