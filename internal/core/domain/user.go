@@ -60,34 +60,19 @@ func (u *User) Validate() error {
 }
 
 type UserPatch struct {
-	FullName    Nullable[string]
-	PhoneNumber Nullable[string]
-}
-
-func (u *UserPatch) Validate() error {
-	if u.FullName.Set && u.FullName.Value == nil {
-		return fmt.Errorf(
-			"FullName cannot be patched to null: %w",
-			core_errors.ErrInvalidArgument,
-		)
-	}
-
-	return nil
+	FullName    *string
+	PhoneNumber *string
 }
 
 func (u *User) ApplyPatch(patch UserPatch) error {
-	if err := patch.Validate(); err != nil {
-		return fmt.Errorf("validate user patch: %w", err)
-	}
-
 	tmp := *u
 
-	if patch.FullName.Set {
-		tmp.FullName = *patch.FullName.Value
+	if patch.FullName != nil {
+		tmp.FullName = *patch.FullName
 	}
 
-	if patch.PhoneNumber.Set {
-		tmp.PhoneNumber = patch.PhoneNumber.Value
+	if patch.PhoneNumber != nil {
+		tmp.PhoneNumber = patch.PhoneNumber
 	}
 
 	if err := tmp.Validate(); err != nil {

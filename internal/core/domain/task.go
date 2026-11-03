@@ -145,6 +145,10 @@ func (t *Task) ApplyPatch(patch TaskPatch) error {
 		}
 	}
 
+	if err := tmp.Validate(); err != nil {
+		return fmt.Errorf("validate patched task: %w", err)
+	}
+
 	*t = tmp
 
 	return nil
