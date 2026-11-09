@@ -46,7 +46,6 @@ func main() {
 	logger.Debug("initializing feature", zap.String("feature", "users"))
 
 	authConfig := auth.NewConfigMust()
-	_ = authConfig
 
 	googleAuthProvider := auth_oauth_google.NewProvider(
 		authConfig.Google.Config,
