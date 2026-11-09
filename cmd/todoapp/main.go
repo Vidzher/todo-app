@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,6 +11,10 @@ import (
 	core_pgx_pool "todo-api/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "todo-api/internal/core/transport/http/middleware"
 	core_http_server "todo-api/internal/core/transport/http/server"
+	"todo-api/internal/features/auth"
+	auth_oauth_google "todo-api/internal/features/auth/oauth/google"
+	auth_service "todo-api/internal/features/auth/service"
+	auth_transport_http "todo-api/internal/features/auth/transport/http"
 	tasks_postgres_repository "todo-api/internal/features/tasks/repository/postgres"
 	tasks_service "todo-api/internal/features/tasks/service"
 	tasks_transport_http "todo-api/internal/features/tasks/transport/http"
@@ -40,6 +45,18 @@ func main() {
 
 	logger.Debug("initializing feature", zap.String("feature", "users"))
 
+	authConfig := auth.NewConfigMust()
+	_ = authConfig
+
+	googleAuthProvider := auth_oauth_google.NewProvider(
+		authConfig.Google.Config,
+		authConfig.Google.UserInfoURL,
+		http.DefaultClient,
+	)
+
+	authService := auth_service.NewAuthService(googleAuthProvider)
+	authTransportHTTP := auth_transport_http.NewAuthHTTPHandler(authService)
+
 	usersRepository := users_postgres_repository.NewUsersRepository(pool)
 	usersService := users_service.NewUsersService(usersRepository)
 	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService)
@@ -60,6 +77,7 @@ func main() {
 	)
 
 	apiVersionRouter := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
+	apiVersionRouter.RegisterRoutes(authTransportHTTP.Routes()...)
 	apiVersionRouter.RegisterRoutes(usersTransportHTTP.Routes()...)
 	apiVersionRouter.RegisterRoutes(tasksTransportHTTP.Routes()...)
 
