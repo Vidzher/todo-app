@@ -14,6 +14,7 @@ import (
 var (
 	createdAtMock = time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
 	taskID        = 1
+	authorUserID  = 1
 )
 
 func TestPatchTask(t *testing.T) {
@@ -26,13 +27,14 @@ func TestPatchTask(t *testing.T) {
 		{
 			name: "VALID: Mark as completed",
 			initial: domain.Task{
-				ID:          taskID,
-				Version:     1,
-				Title:       "Prev",
-				Description: new("Prev"),
-				Completed:   false,
-				CreatedAt:   createdAtMock,
-				CompletedAt: nil,
+				ID:           taskID,
+				Version:      1,
+				Title:        "Prev",
+				Description:  new("Prev"),
+				Completed:    false,
+				CreatedAt:    createdAtMock,
+				CompletedAt:  nil,
+				AuthorUserID: authorUserID,
 			},
 			input: domain.TaskPatch{
 				Completed:   new(true),
@@ -44,13 +46,14 @@ func TestPatchTask(t *testing.T) {
 		{
 			name: "VALID: Mark as uncompleted",
 			initial: domain.Task{
-				ID:          taskID,
-				Version:     1,
-				Title:       "Prev",
-				Description: new("Prev"),
-				Completed:   true,
-				CreatedAt:   createdAtMock,
-				CompletedAt: new(createdAtMock.Add(time.Hour)),
+				ID:           taskID,
+				Version:      1,
+				Title:        "Prev",
+				Description:  new("Prev"),
+				Completed:    true,
+				CreatedAt:    createdAtMock,
+				CompletedAt:  new(createdAtMock.Add(time.Hour)),
+				AuthorUserID: authorUserID,
 			},
 			input: domain.TaskPatch{
 				Completed:   new(false),
@@ -62,13 +65,14 @@ func TestPatchTask(t *testing.T) {
 		{
 			name: "VALID: Change title and description",
 			initial: domain.Task{
-				ID:          taskID,
-				Version:     1,
-				Title:       "Prev",
-				Description: new("Prev"),
-				Completed:   true,
-				CreatedAt:   createdAtMock,
-				CompletedAt: nil,
+				ID:           taskID,
+				Version:      1,
+				Title:        "Prev",
+				Description:  new("Prev"),
+				Completed:    true,
+				CreatedAt:    createdAtMock,
+				CompletedAt:  nil,
+				AuthorUserID: authorUserID,
 			},
 			input: domain.TaskPatch{
 				Completed:   new(false),
