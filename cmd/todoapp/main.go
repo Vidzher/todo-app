@@ -13,6 +13,7 @@ import (
 	core_http_server "todo-api/internal/core/transport/http/server"
 	"todo-api/internal/features/auth"
 	auth_oauth_google "todo-api/internal/features/auth/oauth/google"
+	auth_postgres_repository "todo-api/internal/features/auth/repository/postgres"
 	auth_service "todo-api/internal/features/auth/service"
 	auth_transport_http "todo-api/internal/features/auth/transport/http"
 	tasks_postgres_repository "todo-api/internal/features/tasks/repository/postgres"
@@ -53,12 +54,13 @@ func main() {
 		http.DefaultClient,
 	)
 
-	authService := auth_service.NewAuthService(googleAuthProvider)
-	authTransportHTTP := auth_transport_http.NewAuthHTTPHandler(authService)
-
 	usersRepository := users_postgres_repository.NewUsersRepository(pool)
 	usersService := users_service.NewUsersService(usersRepository)
 	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService)
+
+	authRepository := auth_postgres_repository.NewAuthRepository(pool)
+	authService := auth_service.NewAuthService(googleAuthProvider, authRepository, usersRepository)
+	authTransportHTTP := auth_transport_http.NewAuthHTTPHandler(authService)
 
 	tasksRepository := tasks_postgres_repository.NewTasksRepository(pool)
 	tasksService := tasks_service.NewTasksService(tasksRepository)
@@ -76,8 +78,8 @@ func main() {
 	)
 
 	apiVersionRouter := core_http_server.NewAPIVersionRouter(core_http_server.ApiVersion1)
-	apiVersionRouter.RegisterRoutes(authTransportHTTP.Routes()...)
 	apiVersionRouter.RegisterRoutes(usersTransportHTTP.Routes()...)
+	apiVersionRouter.RegisterRoutes(authTransportHTTP.Routes()...)
 	apiVersionRouter.RegisterRoutes(tasksTransportHTTP.Routes()...)
 
 	httpServer.RegisterAPIRouters(apiVersionRouter)

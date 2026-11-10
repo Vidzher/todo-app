@@ -21,7 +21,7 @@ func (h *AuthHTTPHandler) GoogleCallback(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	user, err := h.authService.CompleteLogin(ctx, code)
+	user, err := h.authService.CompleteLogin(ctx, code, "google")
 	if err != nil {
 		responseHandler.ErrorResponse(err, "get user info")
 	}

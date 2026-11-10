@@ -12,7 +12,7 @@ type AuthHTTPHandler struct {
 
 type AuthService interface {
 	AuthCodeURL(state string) string
-	CompleteLogin(ctx context.Context, code string) (any, error)
+	CompleteLogin(ctx context.Context, code, provider string) (any, error)
 }
 
 func NewAuthHTTPHandler(s AuthService) *AuthHTTPHandler {
