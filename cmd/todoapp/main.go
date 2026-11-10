@@ -59,7 +59,7 @@ func main() {
 	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService)
 
 	authRepository := auth_postgres_repository.NewAuthRepository(pool)
-	authService := auth_service.NewAuthService(googleAuthProvider, authRepository, usersRepository)
+	authService := auth_service.NewAuthService(googleAuthProvider, authRepository)
 	authTransportHTTP := auth_transport_http.NewAuthHTTPHandler(authService)
 
 	tasksRepository := tasks_postgres_repository.NewTasksRepository(pool)

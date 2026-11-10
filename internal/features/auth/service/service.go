@@ -2,15 +2,16 @@ package auth_service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"todo-api/internal/core/domain"
+	core_errors "todo-api/internal/core/errors"
 	auth_oauth_google "todo-api/internal/features/auth/oauth/google"
 )
 
 type AuthService struct {
 	provider     OAuthGoogle
 	identityRepo IdentityRepo
-	userRepo     UserRepo
 }
 
 type OAuthGoogle interface {
@@ -19,10 +20,10 @@ type OAuthGoogle interface {
 }
 
 type IdentityRepo interface {
-	GetUserID(
+	GetUserByIdentity(
 		ctx context.Context,
 		provider, subject string,
-	) (int, error)
+	) (domain.User, error)
 
 	CreateUserWithIdentity(
 		ctx context.Context,
@@ -31,19 +32,13 @@ type IdentityRepo interface {
 	) (domain.User, error)
 }
 
-type UserRepo interface {
-	GetUser(ctx context.Context, id int) (domain.User, error)
-}
-
 func NewAuthService(
 	googleProvider OAuthGoogle,
 	identityRepo IdentityRepo,
-	userRepo UserRepo,
 ) *AuthService {
 	return &AuthService{
 		provider:     googleProvider,
 		identityRepo: identityRepo,
-		userRepo:     userRepo,
 	}
 }
 
@@ -62,34 +57,31 @@ func (s *AuthService) CompleteLogin(ctx context.Context, code, provider string) 
 		return domain.User{}, fmt.Errorf("failed to login via google: %w", err)
 	}
 
-	userID, err := s.identityRepo.GetUserID(ctx, provider, raw.ID)
-	if err != nil {
-		return domain.User{}, fmt.Errorf("not found: %w", err)
+	user, err := s.identityRepo.GetUserByIdentity(ctx, provider, raw.ID)
+	if err == nil {
+		return user, nil
+	}
+
+	if !errors.Is(err, core_errors.ErrNotFound) {
+		return domain.User{}, fmt.Errorf("find by identity: %w", err)
 	}
 
 	var userDomain domain.User
 
-	if userID == 0 {
-		userDomain, err = s.identityRepo.CreateUserWithIdentity(
-			ctx,
-			domain.User{
-				ID:          domain.UninitializedID,
-				Version:     domain.UninitializedID,
-				FullName:    raw.Name,
-				PhoneNumber: nil,
-			},
-			provider,
-			raw.ID,
-			raw.Email,
-		)
-		if err != nil {
-			return domain.User{}, fmt.Errorf("failed to create user: %w", err)
-		}
-	} else {
-		userDomain, err = s.userRepo.GetUser(ctx, userID)
-		if err != nil {
-			return domain.User{}, fmt.Errorf("failed to get user: %w", err)
-		}
+	userDomain, err = s.identityRepo.CreateUserWithIdentity(
+		ctx,
+		domain.User{
+			ID:          domain.UninitializedID,
+			Version:     domain.UninitializedVersion,
+			FullName:    raw.Name,
+			PhoneNumber: nil,
+		},
+		provider,
+		raw.ID,
+		raw.Email,
+	)
+	if err != nil {
+		return domain.User{}, fmt.Errorf("failed to create user: %w", err)
 	}
 
 	return userDomain, nil
