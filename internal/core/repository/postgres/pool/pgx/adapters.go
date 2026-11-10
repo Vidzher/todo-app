@@ -1,6 +1,7 @@
 package core_pgx_pool
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	core_postgres_pool "todo-api/internal/core/repository/postgres/pool"
@@ -30,6 +31,10 @@ type pgxCommandTag struct {
 	pgconn.CommandTag
 }
 
+type pgxTx struct {
+	pgx.Tx
+}
+
 func mapErrors(err error) error {
 	const pgxViolatesForeignKeyErrCode = "23503"
 
@@ -53,4 +58,43 @@ func mapErrors(err error) error {
 		err,
 		core_postgres_pool.ErrUnknown,
 	)
+}
+
+func (tx pgxTx) QueryRow(
+	ctx context.Context,
+	sql string,
+	args ...any,
+) core_postgres_pool.Row {
+	return pgxRow{
+		tx.Tx.QueryRow(ctx, sql, args...),
+	}
+}
+
+func (tx pgxTx) Exec(
+	ctx context.Context,
+	sql string,
+	args ...any,
+) (core_postgres_pool.CommandTag, error) {
+	tag, err := tx.Tx.Exec(ctx, sql, args...)
+	if err != nil {
+		return nil, mapErrors(err)
+	}
+
+	return pgxCommandTag{tag}, nil
+}
+
+func (tx pgxTx) Commit(ctx context.Context) error {
+	if err := tx.Tx.Commit(ctx); err != nil {
+		return mapErrors(err)
+	}
+
+	return nil
+}
+
+func (tx pgxTx) Rollback(ctx context.Context) error {
+	if err := tx.Tx.Rollback(ctx); err != nil {
+		return mapErrors(err)
+	}
+
+	return nil
 }
