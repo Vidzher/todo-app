@@ -11,6 +11,8 @@ require (
 	go.uber.org/zap v1.28.0
 )
 
+require cloud.google.com/go/compute/metadata v0.3.0 // indirect
+
 require (
 	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -23,6 +25,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
+	golang.org/x/oauth2 v0.37.0
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/text v0.42.0 // indirect

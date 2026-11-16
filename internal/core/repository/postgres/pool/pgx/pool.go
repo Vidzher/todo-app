@@ -85,3 +85,12 @@ func (p *Pool) Exec(
 
 	return pgxCommandTag{tag}, nil
 }
+
+func (p *Pool) Begin(ctx context.Context) (core_postgres_pool.Tx, error) {
+	tx, err := p.Pool.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return pgxTx{tx}, nil
+}
